@@ -1,0 +1,41 @@
+version: '3'
+networks:
+  db:
+  web:
+services:
+  mongodb:
+    restart: always
+    image: mongo:4.0.7
+    environment: 
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/dev/null
+    volumes:
+      - ./data/mongodb/ghost:/data/db
+    networks:
+      - db
+  ghost-service:
+    restart: always
+    build: ./ghost-service
+    image: ghost-service
+    environment:
+      - DB=mongodb
+      - PORT=5001
+      - SECRET={secret}
+      - SECRETKEY={secret}
+    networks:
+      - db
+      - web
+    ports:
+      - 5001:5001
+  frontend:
+    restart: always
+    build: ./ghost-app
+    networks:
+      - web
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - ghost-service
+    ports:
+      - 80:80
