@@ -13,6 +13,9 @@ services:
       - ./data/mongodb/ghost:/data/db
     networks:
       - db
+    logging:
+      options:
+        max-size: 500m
   ghost-service:
     restart: always
     build: ./ghost-service
@@ -27,6 +30,9 @@ services:
       - web
     ports:
       - 5001:5001
+    logging:
+      options:
+        max-size: 500m
   frontend:
     restart: always
     build: ./ghost-app
@@ -39,3 +45,6 @@ services:
       - ghost-service
     ports:
       - 80:80
+    logging:
+      options:
+        max-size: 500m
